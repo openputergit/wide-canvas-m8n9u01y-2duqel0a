@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CricTurf Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Poppins', sans-serif;
+        }
+        .hidden {
+            display: none;
+        }
+        .active-tab {
+            border-bottom: 2px solid #3B82F6;
+            color: #3B82F6;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <span class="text-xl font-bold text-blue-600">CricTurf</span>
+                </div>
+                <div class="flex items-center" id="userInfo">
+                    <button onclick="logout()" class="hidden" id="logoutBtn">
+                        <i class="bi bi-box-arrow-right text-xl text-gray-600"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <!-- Login Form -->
+        <div id="loginSection" class="max-w-md mx-auto bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-2xl font-semibold mb-6 text-center">Login</h2>
+            <form id="loginForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Email</label>
+                    <input type="email" id="email" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Password</label>
+                    <input type="password" id="password" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                </div>
+                <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-200">
+                    Login
+                </button>
+            </form>
+        </div>
+
+        <!-- Dashboard -->
+        <div id="dashboard" class="hidden">
+            <!-- Tab Navigation -->
+            <div class="flex justify-center space-x-4 mb-6">
+                <button class="tab-btn active-tab px-4 py-2" data-tab="attendance">Attendance</button>
+                <button class="tab-btn px-4 py-2" data-tab="bookings">Bookings</button>
+                <button class="tab-btn px-4 py-2" data-tab="teams">Teams</button>
+                <button class="tab-btn px-4 py-2" data-tab="scoring">Scoring</button>
+                <button class="tab-btn px-4 py-2" data-tab="stats">Stats</button>
+            </div>
+
+            <!-- Tab Contents -->
+            <div id="attendance" class="tab-content">
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-xl font-semibold mb-4">Today's Attendance</h3>
+                    <div class="flex items-center justify-between mb-4">
+                        <p id="location" class="text-gray-600"></p>
+                        <button onclick="markAttendance()" class="bg-green-500 text-white px-4 py-2 rounded-md">
+                            Mark Attendance
+                        </button>
+                    </div>
+                    <div id="attendanceList" class="space-y-2"></div>
+                </div>
+            </div>
+
+            <div id="bookings" class="tab-content hidden">
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-xl font-semibold mb-4">Book a Slot</h3>
+                    <form id="bookingForm" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Date</label>
+                                <input type="date" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Time Slot</label>
+                                <select required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                                    <option>6:00 AM - 8:00 AM</option>
+                                    <option>8:00 AM - 10:00 AM</option>
+                                    <option>4:00 PM - 6:00 PM</option>
+                                    <option>6:00 PM - 8:00 PM</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md">
+                            Book Now
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="teams" class="tab-content hidden">
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-xl font-semibold mb-4">Team Management</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="border rounded-lg p-4">
+                            <h4 class="font-medium mb-2">Team A</h4>
+                            <div id="teamA" class="space-y-2"></div>
+                        </div>
+                        <div class="border rounded-lg p-4">
+                            <h4 class="font-medium mb-2">Team B</h4>
+                            <div id="teamB" class="space-y-2"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="scoring" class="tab-content hidden">
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-xl font-semibold mb-4">Live Scoring</h3>
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <span class="font-medium">Team A:</span>
+                                <span id="teamAScore">0/0</span>
+                            </div>
+                            <div>
+                                <span class="font-medium">Overs:</span>
+                                <span id="overs">0.0</span>
+                            </div>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button onclick="addRuns(0)" class="bg-gray-200 px-4 py-2 rounded">0</button>
+                            <button onclick="addRuns(1)" class="bg-gray-200 px-4 py-2 rounded">1</button>
+                            <button onclick="addRuns(2)" class="bg-gray-200 px-4 py-2 rounded">2</button>
+                            <button onclick="addRuns(4)" class="bg-gray-200 px-4 py-2 rounded">4</button>
+                            <button onclick="addRuns(6)" class="bg-gray-200 px-4 py-2 rounded">6</button>
+                            <button onclick="addWicket()" class="bg-red-500 text-white px-4 py-2 rounded">W</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="stats" class="tab-content hidden">
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-xl font-semibold mb-4">Leaderboard</h3>
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="border rounded-lg p-4">
+                                <h4 class="font-medium mb-2">Most Runs</h4>
+                                <ol id="runsLeaderboard" class="list-decimal pl-4"></ol>
+                            </div>
+                            <div class="border rounded-lg p-4">
+                                <h4 class="font-medium mb-2">Most Wickets</h4>
+                                <ol id="wicketsLeaderboard" class="list-decimal pl-4"></ol>
+                            </div>
+                            <div class="border rounded-lg p-4">
+                                <h4 class="font-medium mb-2">Best Strike Rate</h4>
+                                <ol id="srLeaderboard" class="list-decimal pl-4"></ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simulated data
+        let isLoggedIn = false;
+        let currentLocation = '';
+        let score = 0;
+        let wickets = 0;
+        let ballCount = 0;
+
+        // Login handling
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            isLoggedIn = true;
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
+            document.getElementById('logoutBtn').classList.remove('hidden');
+            getLocation();
+        });
+
+        // Location tracking
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition);
+            }
+        }
+
+        function showPosition(position) {
+            currentLocation = `Lat: ${position.coords.latitude}, Long: ${position.coords.longitude}`;
+            document.getElementById('location').textContent = `Current Location: ${currentLocation}`;
+        }
+
+        // Tab switching
+        document.querySelectorAll('.tab-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active-tab'));
+                this.classList.add('active-tab');
+                
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
+                document.getElementById(this.dataset.tab).classList.remove('hidden');
+            });
+        });
+
+        // Scoring system
+        function addRuns(runs) {
+            score += runs;
+            ballCount++;
+            updateScore();
+        }
+
+        function addWicket() {
+            wickets++;
+            ballCount++;
+            updateScore();
+        }
+
+        function updateScore() {
+            document.getElementById('teamAScore').textContent = `${score}/${wickets}`;
+            document.getElementById('overs').textContent = `${Math.floor(ballCount/6)}.${ballCount%6}`;
+        }
+
+        // Logout
+        function logout() {
+            isLoggedIn = false;
+            document.getElementById('dashboard').classList.add('hidden');
+            document.getElementById('loginSection').classList.remove('hidden');
+            document.getElementById('logoutBtn').classList.add('hidden');
+        }
+
+        // Initialize leaderboards
+        function initializeLeaderboards() {
+            const sampleData = [
+                {name: "Player 1", value: "245 runs"},
+                {name: "Player 2", value: "198 runs"},
+                {name: "Player 3", value: "156 runs"}
+            ];
+
+            const leaderboards = ['runsLeaderboard', 'wicketsLeaderboard', 'srLeaderboard'];
+            leaderboards.forEach(board => {
+                const element = document.getElementById(board);
+                sampleData.forEach(player => {
+                    const li = document.createElement('li');
+                    li.textContent = `${player.name} - ${player.value}`;
+                    element.appendChild(li);
+                });
+            });
+        }
+
+        // Initialize when document loads
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeLeaderboards();
+        });
+    </script>
+<script>document.body.addEventListener('wheel', e => { if (!e.ctrlKey) return; e.preventDefault(); return }, { passive: false })</script>
+	</body>
+</html>
